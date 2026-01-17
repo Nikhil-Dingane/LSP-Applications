@@ -1,0 +1,25 @@
+#include<stdio.h>
+#include<stdlib.h>
+#include<unistd.h>
+#include<sys/shm.h>
+#include<sys/ipc.h>
+#include<errno.h>
+
+int main()
+{
+	int id = 0;
+
+	id = shmget(11, 1024, 0666 | IPC_CREAT);
+
+	if(id != -1)
+	{
+		printf("Shared memory is allocated by server\n");
+	}
+	else
+	{
+		perror("");
+		return -1;
+	}
+
+	return 0;
+}
