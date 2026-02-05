@@ -1,0 +1,87 @@
+#include<stdio.h>
+#include<pthread.h>
+#include<unistd.h>
+#include<fcntl.h>
+#include<errno.h>
+#include<string.h>
+#include<stdlib.h>
+
+#define BUFFER_SIZE 1024
+
+void * Demo(void *p)
+{
+	int fd = 0, iRet = 0, iCnt = 0, i = 0;
+	char buffer[BUFFER_SIZE] = {'\0'};
+
+	fd = open("PPA.txt", O_RDONLY);
+
+	while((iRet = read(fd, buffer, BUFFER_SIZE)) != 0)
+	{
+		for(i = 0; i < iRet; i++)
+		{
+			if(buffer[i] >= 'A' && buffer[i] <= 'Z')
+				iCnt++;
+		}
+	}
+
+	printf("Number of capital characters: %d", iCnt);
+	return NULL;
+}
+
+void * Hello(void *p)
+{
+	int fd = 0, iRet = 0, iCnt = 0, i = 0;
+	char buffer[BUFFER_SIZE] = {'\0'};
+
+	fd = open("LB.txt", O_RDONLY);
+
+	while((iRet = read(fd, buffer, BUFFER_SIZE)) != 0)
+	{
+		for(i = 0; i < iRet; i++)
+		{
+			if(buffer[i] >= 'a' && buffer[i] <= 'z')
+				iCnt++;
+		}
+	}
+
+	printf("Number of small characters: %d", iCnt);
+	return NULL;
+}
+
+int main()
+{
+	pthread_t TID1, TID2;
+	int iRet = 0;
+
+	printf("Main thread started\n");
+	iRet = pthread_create(
+		&TID1,	// Thread ID
+		NULL,	// Thread attributes
+		Demo,	// Thread callback function
+		NULL	// Parameters fro the callback function
+	);
+
+	if(iRet == 0)
+	{
+		printf("Thread gets created successfully with TID: %lu\n", (unsigned long)TID1);
+	}
+	
+	iRet = pthread_create(
+		&TID2,	// Thread ID
+		NULL,	// Thread attributes
+		Hello,	// Thread callback function
+		NULL	// Parameters fro the callback function
+	);
+
+	if(iRet == 0)
+	{
+		printf("Thread gets created successfully with TID: %lu\n", (unsigned long)TID2);
+	}
+
+
+	pthread_join(TID1, NULL);
+	pthread_join(TID2, NULL);
+	printf("End of main thread\n");
+
+	return 0;
+}
